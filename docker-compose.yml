@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  aura-backend:
+    build:
+      context: ./aura-backend
+      dockerfile: Dockerfile
+    image: aura-backend:local
+    env_file:
+      - ./aura-backend/.env
+    ports:
+      - "5001:8080"
+    restart: unless-stopped
+    # If you need to limit resources on some platforms:
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 1G

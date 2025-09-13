@@ -23,6 +23,28 @@
 ## One-click with render.yaml
 You can commit the included `render.yaml` and click “New +” → “Blueprint” in Render to auto-provision the service with correct build/start commands. Fill in env vars during setup.
 
+# Deploying to Google Cloud Run (alternative)
+
+## Prereqs
+- Google Cloud project with billing enabled
+- gcloud CLI installed and authenticated (`gcloud auth login` and `gcloud config set project <PROJECT_ID>`)
+
+## Build and deploy
+1. From the `aura-backend/` directory, build the image:
+   - `gcloud builds submit --tag gcr.io/<PROJECT_ID>/aura-backend`
+2. Deploy to Cloud Run:
+   - `gcloud run deploy aura-backend \
+      --image gcr.io/<PROJECT_ID>/aura-backend \
+      --platform managed \
+      --region <REGION> \
+      --allow-unauthenticated \
+      --set-env-vars DATABASE_URL=<your-neon-url>,JWT_SECRET_KEY=<random-secret>,CORS_ORIGINS=<frontend-url>,RATELIMIT_STORAGE_URI=<optional-redis-uri>`
+3. Visit the URL output by Cloud Run and check `/api/health`.
+
+Notes:
+- Cloud Run automatically sets PORT; Dockerfile already uses `${PORT}`.
+- For Redis (rate limits) consider Memorystore (Redis) or a hosted Redis provider and pass its URI via `RATELIMIT_STORAGE_URI`.
+
 ## Frontend
 - Store the token from `/login` and send it as `Authorization: Bearer <token>` on protected routes.
 - Protected routes: `/api/dashboard`, `/api/chat`, `/api/ai/calibrate`, `/api/dev/simulate-data`, `/api/user/report`.
