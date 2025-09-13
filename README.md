@@ -1,503 +1,341 @@
-## Step 1: Start Your Main Server
-This is the most important step. You are no longer running any temporary test files. You are running the final application.
-Make sure your virtual environment is activated (source .venv/bin/activate).
-In your terminal, from the aura-backend directory, run the main app.py file:
-code
-```bash
-python app.py
-```
-You should see all the "Loading model..." and "Initializing..." messages, followed by a line confirming the server is running on port 5000.
-code
-```Code
-* Running on http://127.0.0.1:5000
-```
-Your backend is now live and waiting.
-## Step 2: Use curl to Act Like the Frontend
-Open a new, separate terminal window. (Do not close the one where the server is running).
-This new terminal is your "testing ground." You will send different curl commands to see how the AI core responds to different user inputs.
-Here are a few scenarios to test.
-Test Case 1: A Simple Meal
-Goal: See if the NLP, prediction, and recommendation work for a standard meal.
-Run this command:
-code
-```Bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
-        "message": "I am having a sandwich and an apple for lunch"
-      }' \
-  http://127.0.0.1:5000/api/chat
-```
-What to look for in the response:
-parsed_info.carbs should be around 55.
-dose_recommendation should give a reasonable dose for that carb amount.
-glucose_prediction.adjusted_prediction should show a gentle rise in glucose.
-Test Case 2: A Meal with Exercise
-Goal: Verify that the "hybrid" model logic is working and that the exercise context is being used.
-Run this command:
-code
-```Bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
-        "message": "just ate a bowl of pasta and am going for a 45 minute walk"
-      }' \
-  http://127.0.0.1:5000/api/chat
-```
-What to look for in the response:
-parsed_info should detect both "pasta" and "walk".
-dose_recommendation.reasoning should include the phrase "Adjusted for recent exercise."
-contextual_advice.exercise_reduction should be true.
-glucose_prediction.adjusted_prediction should show a much flatter curve than a meal alone would.
-Test Case 3: An Explicit Carb Amount
-Goal: Check if the NLP correctly prioritizes a user's specific carb count.
-Run this command:
-code
-Bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
-        "message": "dinner was about 80g of carbs"
-      }' \
-  http://127.0.0.1:5000/api/chat
-What to look for in the response:
-parsed_info.carbs should be exactly 80.
-parsed_info.warnings should contain the message: "Used explicit carb amount, ignoring food estimates".
-Test Case 4: Just an Activity
-Goal: Ensure the system handles non-meal logs gracefully.
-Run this command:
-code
-Bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
-        "message": "finished a tough workout at the gym"
-      }' \
-  http://127.0.0.1:5000/api/chat
-What to look for in the response:
-parsed_info.carbs should be 0.
-parsed_info.activities_detected should correctly identify the "gym" workout.
-dose_recommendation.recommended_dose should likely be 0.0.
-# 🌟 Project Aura: The Ultimate Diabetes Command Center
+<div align="center">
 
-> *A responsive web application that transforms the daily cognitive burden of diabetes into a proactive, predictive, and seamless experience*
+# Aura – Insulin Partner (Backend)
 
-[![Status](https://img.shields.io/badge/Status-In%20Development-orange?style=for-the-badge)](https://github.com/your-repo/project-aura)
-[![Web App](https://img.shields.io/badge/Platform-Web%20App-brightgreen?style=for-the-badge)](https://github.com/your-repo/project-aura)
-[![AI Powered](https://img.shields.io/badge/AI-Powered-blue?style=for-the-badge)](https://github.com/your-repo/project-aura)
-[![100% Free Stack](https://img.shields.io/badge/Stack-100%25%20Free-gold?style=for-the-badge)](https://github.com/your-repo/project-aura)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-API-black?logo=flask)](https://flask.palletsprojects.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?logo=postgresql)](https://neon.tech/)
+[![JWT](https://img.shields.io/badge/Auth-JWT-purple)](https://flask-jwt-extended.readthedocs.io/)
+[![Rate Limit](https://img.shields.io/badge/Security-Rate%20Limiting-orange)](https://flask-limiter.readthedocs.io/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
+
+AI‑assisted diabetes companion backend: secure user auth, NLP‑powered chat intents, glucose predictions, PDF reports, dashboard analytics, and realistic data simulation.
+
+</div>
 
 ---
 
-## 🎯 Visi
+## Highlights
 
-**Project Aura is the ultimate command center for diabetes management.** Accessible from any browser on any device, it transforms the daily cognitive burden of diabetes into a proactive, predictive, and seamless experience. By centralizing data, forecasting future trends, and providing personalized AI-driven insights, Aura empowers users to take control of their health with confidence and clarity.
+- Secure by default: JWT auth, per‑route rate limiting, and CORS allow‑list
+- Environment‑only secrets (no hardcoded fallbacks)
+- Postgres (Neon) database with ready schema and helpers
+- AI core to parse intents and log meals automatically
+- Background model calibration per user
+- PDF report generation endpoint
+- Health endpoint with DB status and CORS info
+- First‑class Docker + docker‑compose support
 
----
-
-## ✨ Core Features
-
-### 🧠 **Intelligent Prediction Engine**
-- **Glucose Forecasting**: LSTM-powered predictions showing where glucose levels are headed in the next 1-2 hours
-- **Visual Future Mapping**: Dual-line charts showing historical (solid) and predicted (dashed) glucose trends
-- **Target Range Visualization**: Green background zones highlighting optimal glucose ranges (70-180 mg/dL)
-
-### 🎯 **Personalized AI Dosing**
-- **Reinforcement Learning Agent**: Trained in simglucose environment to learn optimal dosing strategies
-- **Instant Recommendations**: Enter carbs → Get AI-powered dose suggestion in seconds
-- **Safety First**: Deep Q-Network trained with reward functions that heavily penalize dangerous lows
-
-### 🌐 **Universal Accessibility**
-- **Any Device, Any Browser**: Responsive web design works on desktop, tablet, and mobile
-- **No Installation Required**: Access your diabetes command center from anywhere
-- **Progressive Web App**: Fast, reliable performance with offline capabilities
-
-### 📊 **Professional Data Visualization**
-- **Interactive Charts**: Built with Recharts for smooth, beautiful data exploration
-- **Real-time Updates**: Live data synchronization across all connected devices
-- **Clean Interface**: Material-UI components for a polished, medical-grade appearance
+> Note on free deployment: Render’s free tier proved insufficient for this stack. Recommended free/low‑friction options: Railway (quick) or Google Cloud Run (scalable). See Deployment below.
 
 ---
 
-## 🏗️ Architecture (100% Free Stack)
+## Repository layout
 
-### Technology Stack
-
-#### **Frontend (Lightning Fast & Beautiful)**
 ```
-⚛️ React + Vite (Ultra-fast development)
-🎨 Material-UI (MUI) - Professional design system
-📊 Recharts - Interactive data visualizations
-🔗 Axios - API communication
-🗃️ Zustand - Simple, powerful state management
-🌐 Progressive Web App capabilities
-```
-
-#### **Backend (Robust & Intelligent)**
-```
-🐍 Python + Flask/FastAPI
-🧠 TensorFlow/Keras (LSTM predictions)
-🤖 Stable-Baselines3 (DQN reinforcement learning)
-🔬 simglucose (Diabetes simulation environment)
-⏰ TimescaleDB extension (Time-series optimization)
-```
-
-#### **Database & Deployment (Enterprise-Grade, Zero Cost)**
-```
-🗄️ PostgreSQL + TimescaleDB
-☁️ Vercel (Frontend hosting)
-🚀 Render (Backend + Database hosting)
-🔄 GitHub Actions (CI/CD pipeline)
+Aura-Insuline-Partner/
+├─ aura-backend/
+│  ├─ app.py                 # Flask app with routes, JWT, limiter, CORS
+│  ├─ config.py              # Env‑driven config (DATABASE_URL, JWT_SECRET_KEY, ...)
+│  ├─ database.py            # Schema + queries + dashboard aggregates
+│  ├─ intelligent_core.py    # AI intent processing
+│  ├─ model_trainer.py       # Per‑user fine‑tune entry (async thread)
+│  ├─ natural_language_processor.py
+│  ├─ prediction_service.py
+│  ├─ recommendation_service.py
+│  ├─ report_generator.py    # PDF report creation
+│  ├─ simulator.py           # Fast bulk data generator
+│  ├─ wsgi.py                # Gunicorn entrypoint (wsgi:app)
+│  ├─ requirements.txt
+│  ├─ Dockerfile             # Production container (Gunicorn)
+│  ├─ .dockerignore
+│  ├─ .env.example
+│  └─ temp_reports/
+├─ docker-compose.yml        # One‑command local run
+├─ DEPLOYMENT.md             # Cloud Run + Render notes
+└─ README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## Security & configuration
 
-### Prerequisites
+- JWT authentication with 12‑hour tokens
+- Rate limiting
+  - Global: 200/hour
+  - Per‑route: stricter limits for login, chat, simulate, calibrate
+  - Optional persistent store via `RATELIMIT_STORAGE_URI` (e.g., Redis)
+- CORS allow‑list via `CORS_ORIGINS` (comma‑separated origins)
+- Secrets only from environment variables (no fallbacks)
+- Health endpoint returns DB status; keep DEBUG off in prod
+
+Environment variables (see `aura-backend/.env.example`):
+
+- DATABASE_URL (required) – e.g. `postgresql://user:pass@host:5432/db?sslmode=require`
+- JWT_SECRET_KEY (required) – long random secret
+- CORS_ORIGINS – comma‑separated list, e.g. `http://127.0.0.1:5500`
+- PORT – default 5001 locally; container listens on 8080
+- RATELIMIT_STORAGE_URI – optional (Redis), recommended for production
+- DEBUG – `false` in production
+
+---
+
+## Quick start (Docker)
+
+1) Copy example env and fill in values
+
 ```bash
-# Backend Requirements
-Python 3.8+
-PostgreSQL 12+ (or use Render's managed database)
-
-# Frontend Requirements  
-Node.js 16+
-Modern web browser
+cp aura-backend/.env.example aura-backend/.env
+# edit aura-backend/.env with your DATABASE_URL and JWT_SECRET_KEY
 ```
 
-### Installation
+2) Start with Docker Compose (recommended)
 
-#### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-repo/project-aura.git
-cd project-aura
+docker compose up --build
 ```
 
-#### 2. Backend Setup
+Service will be available at: http://127.0.0.1:5001
+
+3) Health check
+
 ```bash
-cd backend
+curl http://127.0.0.1:5001/api/health
+```
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+Alternative: plain Docker
 
-# Install dependencies
+```bash
+docker build -t aura-backend:local ./aura-backend
+docker run --env-file aura-backend/.env -p 5001:8080 aura-backend:local
+```
+
+---
+
+## Quick start (local Python)
+
+```bash
+cd aura-backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Setup database (local development)
-flask db upgrade
-
-# Generate mock data for development
-python scripts/generate_mock_data.py
-
-# Start the development server
-flask run --debug
+export DATABASE_URL=postgresql://.../db?sslmode=require
+export JWT_SECRET_KEY=your-long-random-secret
+export CORS_ORIGINS=http://127.0.0.1:5500
+python app.py
 ```
 
-#### 3. Frontend Setup
+Server binds to 0.0.0.0 on port 5001 by default. Visit `/api/health` to verify.
+
+---
+
+## API overview
+
+Auth
+- POST `/register` – create account: `{ username, password, name, ... }`
+- POST `/login` – returns `{ token, user_id }`
+
+Protected (require `Authorization: Bearer <token>` and correct `user_id`)
+- POST `/api/chat` – `{ message, user_id }` → AI intent + optional meal logging
+- GET  `/api/dashboard?user_id=...` – merged metrics for user
+- POST `/api/ai/calibrate` – `{ user_id }` → starts background fine‑tune; returns 202
+- POST `/api/dev/simulate-data` – `{ user_id }` → seeds 3 days of demo data
+- POST `/api/user/report` – `{ user_id }` → returns a PDF file download
+
+Public
+- GET `/api/health` – `{ db: "ok"|error, cors_allowed_origins: [...] }`
+
+Example: Login then Chat
+
 ```bash
-cd frontend
+# login
+TOKEN=$(curl -s -X POST http://127.0.0.1:5001/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"demo","password":"secret"}' | jq -r .token)
 
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Your app will be available at http://localhost:5173
-```
-
-#### 4. Production Deployment
-
-**Frontend (Vercel):**
-```bash
-# Connect your GitHub repo to Vercel
-# Automatic deployments on every push to main
-```
-
-**Backend (Render):**
-```bash
-# Create Dockerfile
-# Connect to Render web service
-# Link to managed PostgreSQL database
+# chat
+curl -X POST http://127.0.0.1:5001/api/chat \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"I ate pasta and an apple","user_id":1}'
 ```
 
 ---
 
-## 🏃‍♂️ Development Workflow
+## How the backend works (end‑to‑end)
 
-### Team Structure (Hackathon Optimized)
+This section explains the full flow from a user message to AI output, database writes, and reports. It’s based on these modules: `intelligent_core.py`, `natural_language_processor.py`, `prediction_service.py`, `recommendation_service.py`, `database.py`, and `report_generator.py`.
 
-### Team Structure (Hackathon Optimized)
+### 1) NLP parsing (natural_language_processor.py)
 
-#### **Backend Team** 👩‍💻👨‍💻
+- Enhanced dictionary‑driven NLP extracts:
+  - Foods and quantities (e.g., “2 slices of pizza”, “an apple”)
+  - Estimated carbs using a food carb database with serving sizes
+  - Activities with duration and intensity (e.g., “45 minute walk” → moderate)
+  - Explicit carbs override (e.g., “80g carbs”)
+  - Meal timing hints (breakfast/lunch/dinner)
+- Robustness techniques:
+  - Variation maps (e.g., “spaghetti” → pasta) and whole‑word regex matching
+  - Quantity detection in a narrow text window to avoid false matches
+  - Confidence score computed from entities found
 
-**Backend Developer 1: The Architect & API Specialist**
-- 🏗️ Flask/FastAPI project structure
-- 🗄️ PostgreSQL + TimescaleDB setup
-- 🔌 REST API development & CORS configuration
-- 🎭 **CRITICAL**: Data simulator for frontend unblocking
-- ☁️ Render deployment & integration
+Output shape example:
 
-**Backend Developer 2: The AI Specialist** 
-- 🧠 LSTM glucose prediction model (OhioT1DM dataset)
-- 🤖 DQN reinforcement learning agent (simglucose environment)
-- 🔬 Model training & optimization
-- 📦 Model packaging for API integration
-
-#### **Frontend Team** 👩‍🎨👨‍🎨
-
-**Frontend Developer 1: UI Architect & Data Viz Lead**
-- ⚛️ React + Vite project setup
-- 🎨 Material-UI component architecture  
-- 📊 **STAR FEATURE**: Dual-line glucose chart (Recharts)
-- 📱 Responsive design & Vercel deployment
-
-**Frontend Developer 2: State & Features Specialist**
-- 🗃️ Zustand state management
-- 🔗 Axios API integration
-- ✨ Interactive logging modal
-- 📸 Camera-based meal logging
-- ⚡ Real-time recommendation flow
-
----
-
-## 📋 API Endpoints
-
-### Core Endpoints
-```http
-# Authentication
-POST /register
-POST /login
-
-# Dashboard Data
-GET /api/dashboard
-→ Complete dashboard data package
-
-# Development (Critical for parallel development)
-GET /api/dev/simulate-data  
-→ Generates realistic mock data for frontend team
-
-# Glucose Predictions  
-GET /api/glucose/prediction
-→ LSTM-powered 1-2 hour forecasts
-
-# Smart Dosing
-POST /api/dose/recommendation
-→ DQN agent recommendations
-
-# Logging
-POST /api/log/meal
-POST /api/log/image
-→ Meal logging with image upload support
-```
-
-### Response Examples
 ```json
-// Dashboard Response
 {
-  "currentGlucose": 120,
-  "glucoseHistory": [115, 118, 120],
-  "predictions": [125, 128, 130],
-  "user": {"name": "John", "target_range": [70, 180]},
-  "isLoading": false
-}
-
-// Dose Recommendation
-{
-  "recommendedDose": 4.5,
-  "confidence": 0.87,
-  "reasoning": "Based on current glucose trend and carb input"
-}
-
-// Dev Simulator Response
-{
-  "message": "Mock data generated successfully",
-  "dataPoints": 288,
-  "timeRange": "24 hours"
+  "carbs": 65,
+  "foods_detected": [
+    {"food": "pasta", "quantity": 1, "carbs": 45, "serving_size": "1 cup"},
+    {"food": "apple", "quantity": 1, "carbs": 25}
+  ],
+  "activities_detected": [
+    {"activity": "walk", "intensity": "light", "duration_minutes": 45}
+  ],
+  "meal_type": "dinner",
+  "warnings": ["Used explicit carb amount, ignoring food estimates"],
+  "confidence": 0.86,
+  "original_text": "Had pasta and an apple, going for a 45 min walk"
 }
 ```
 
----
+### 2) AI orchestrator (intelligent_core.py)
 
-## 🎮 Demo Features & Development Roadmap
+`process_user_intent(user_id, user_text, glucose_history)` coordinates the pipeline:
+- Lazy‑loads the NLP processor on first use (faster app startup)
+- Parses text → gets carbs, activities, timing
+- Reads current glucose from provided history (or falls back safely)
+- Calls dosing recommendation engine with context flags
+- Builds future event hints (carbs, activity) and calls the hybrid predictor
+- Produces contextual advice (e.g., exercise reductions, timing notes)
+- Returns a comprehensive response (see below)
 
-### 🌟 **Hackathon Victory Features**
+Output shape example:
 
-#### **Day 1 Morning: Foundation**
-- ✅ **Backend**: Flask API scaffolding + PostgreSQL setup
-- ✅ **Frontend**: React + Vite + MUI project structure
-- 🎯 **Critical Path**: Data simulator endpoint (`/api/dev/simulate-data`)
-
-#### **Day 1 Afternoon: The Magic**
-- 📊 **Star Feature**: Dual-line glucose chart (historical solid, predicted dashed)
-- 🧠 **LSTM Model**: Trained on OhioT1DM dataset, packaged for API
-- 🤖 **DQN Agent**: Training in simglucose environment
-- 🗃️ **State Management**: Zustand store with live data integration
-
-#### **Day 2: Integration & Polish**
-- ⚡ **Recommendation Flow**: Carbs input → AI dose suggestion (< 2 seconds)
-- 📸 **Smart Logging**: Camera upload → Mock carb estimation
-- ☁️ **Deployment**: Live demo on Vercel + Render
-- 🎨 **UI Polish**: Responsive design, loading states, error handling
-
-### 🏆 **Judge-Winning Moments**
-
-1. **📈 Predictive Chart**
-   ```
-   "Watch this - the solid line shows actual glucose,
-   the dashed line shows where our AI thinks it's heading.
-   This transforms reactive care into proactive management."
-   ```
-
-2. **⚡ Lightning-Fast Recommendations**  
-   ```
-   "I'll enter 45g of carbs... *click* ... and instantly
-   our reinforcement learning agent suggests 4.2 units
-   based on current glucose trends."
-   ```
-
-3. **🌐 Universal Access**
-   ```
-   "No app store, no installation, no device restrictions.
-   Works on any browser, anywhere, instantly accessible
-   in medical emergencies."
-   ```
-
-4. **🔬 Technical Depth**
-   ```
-   "Behind the scenes: LSTM neural networks for prediction,
-   Deep Q-Networks for dosing, all trained on medical-grade
-   simulation environments. This is real AI, not just APIs."
-   ```
-
----
-
-## 🔬 AI Models Deep Dive
-
-### LSTM Glucose Prediction Model
-```python
-# Architecture for 1-2 hour glucose forecasting
-model = Sequential([
-    LSTM(50, return_sequences=True, input_shape=(sequence_length, features)),
-    LSTM(50, return_sequences=False),
-    Dense(25, activation='relu'),
-    Dense(prediction_horizon)  # 12 points (1-2 hours at 10min intervals)
-])
-
-# Training Data: OhioT1DM dataset
-# Input: [glucose_history, insulin_history, carb_history]
-# Output: [future_glucose_12_points]
+```json
+{
+  "parsed_info": { /* output from NLP above */ },
+  "dose_recommendation": {"recommended_dose": 4.2, "confidence": 0.9, "reasoning": "..."},
+  "glucose_prediction": {
+    "status": "success",
+    "last_known_glucose": 128,
+    "original_prediction": [130,133,...],
+    "adjusted_prediction": [129,131,...],
+    "prediction_bounds": {"upper": [...], "lower": [...]},
+    "analysis": {"trend": "rising", "slope": 0.6}
+  },
+  "contextual_advice": {"carb_bolus_needed": true, "exercise_reduction": true, ...}
+}
 ```
 
-### DQN Reinforcement Learning Agent  
-```python
-# Environment: simglucose diabetes simulator
-# State Space: [current_glucose, glucose_trend, time_since_last_meal, active_insulin]
-# Action Space: insulin_dose (continuous, 0-20 units)
-# Reward Function:
-reward = time_in_range_bonus - (hypoglycemia_penalty * 10) - hyperglycemia_penalty
+### 3) Glucose prediction (prediction_service.py)
 
-# Training with Stable-Baselines3 DQN
-agent = DQN('MlpPolicy', env, learning_rate=1e-3, 
-            buffer_size=10000, learning_starts=1000)
-```
+- Lazy‑loads Keras/TensorFlow only when needed; caches models and scalers
+- Personalized model per user if available: `glucose_predictor_user_<id>.h5` + scaler
+- Default model fallback: `glucose_predictor.h5` + `scaler.gz`
+- Rolling 12‑step prediction horizon (approx. 2 hours), with inverse scaling
+- Physiological constraints clamp impossible jumps and keep values within [40, 400]
+- Hybrid adjustment layer adds carb and activity effects, then re‑constrains
+- Trend analysis (slope and qualitative trend) included when requested
 
-### Integration Wrapper Functions
-```python
-def predict_future_glucose(recent_glucose_list):
-    """
-    Takes: List of recent glucose readings
-    Returns: List of predicted glucose values (next 1-2 hours)
-    """
-    
-def get_dose_recommendation(current_glucose, meal_carbs):
-    """
-    Takes: Current glucose level, planned meal carbs
-    Returns: Recommended insulin dose from trained DQN agent
-    """
-```
+Key error modes handled:
+- Missing default model → explicit error in response
+- Insufficient history (<12 points) → informative error message
 
----
+### 4) Insulin dosing recommendation (recommendation_service.py)
 
-## 📊 Development Status
+- RL agent (Stable‑Baselines3 DQN) is lazy‑loaded; model file `aura_dqn_agent(.zip)`
+- If the RL model is absent, returns a clear error so the caller can fallback in UI
+- Hybrid approach combines: RL base suggestion + standard carb and correction math
+- Contextual modifiers:
+  - Exercise reduction (e.g., −30%) for recent activity
+  - Stress increase if stress_level is high
+- Safety clamping caps dose between 0 and 20 units
 
-### ✅ **Day 1 Morning (Foundation Complete)**
-- [x] Project architecture finalized
-- [x] Technology stack selected (100% free)
-- [x] Team roles and responsibilities defined
-- [x] Development roadmap locked in
+### 5) Database I/O (database.py)
 
-### 🔄 **Day 1 Afternoon (In Progress)**  
-- [ ] Flask API scaffolding (Backend Dev 1) - **90% complete**
-- [ ] Data simulator endpoint (Backend Dev 1) - **CRITICAL PRIORITY**
-- [ ] React + MUI setup (Frontend Dev 1) - **85% complete**  
-- [ ] LSTM model training (Backend Dev 2) - **70% complete**
-- [ ] Zustand state management (Frontend Dev 2) - **60% complete**
+- Postgres schema: users, glucose_readings, insulin_doses, meal_logs
+- Dashboard aggregation returns profile, last 24h glucose, recent meals, and a computed daily health score
+- Health score: primarily based on time‑in‑range with penalties for lows/highs
+- Helper to add logs (meals/insulin), with NOW() timestamps
 
-### 📅 **Day 2 (Final Sprint)**
-- [ ] **Star Feature**: Dual-line glucose chart
-- [ ] AI model integration into API endpoints
-- [ ] Recommendation flow implementation
-- [ ] Camera-based logging
-- [ ] Production deployment (Vercel + Render)
-- [ ] Demo preparation & testing
+### 6) Report generation (report_generator.py)
 
-### 🎯 **Success Metrics**
-- ⚡ **< 2 second** response time for dose recommendations
-- 📊 **Smooth 60fps** chart animations and interactions  
-- 🌐 **Cross-browser** compatibility (Chrome, Firefox, Safari)
-- 📱 **Mobile responsive** design (works on phones, tablets, desktop)
-- 🧠 **Live AI predictions** with reasonable accuracy on demo data
+- Fetches dashboard data and generates a professional PDF
+- Creates a Matplotlib glucose chart image for the last 24 hours
+- Adds a summary section: health score, time in range, hypoglycemia events
+- Lists recent meals in a simple table
+- Saves PDF to `aura-backend/temp_reports/`, returns file path and filename
 
----
+### 7) Request lifecycle (app.py)
 
-## 🎯 Hackathon Success Metrics
+- `/api/chat` (POST, protected):
+  - Requires JWT and matching `user_id`
+  - Pulls last 12 glucose readings (fallback sample if too few)
+  - Invokes `process_user_intent`
+  - Saves detected meals to DB (if any)
+  - Returns AI output to the client
 
-### Technical Excellence
-- ✅ Working AI models with real predictions
-- ✅ Seamless mobile experience
-- ✅ Live data integration
-- ✅ Computer vision functionality
+- `/api/user/report` (POST, protected):
+  - Generates a PDF via `report_generator.create_user_report` and sends the file
 
-### Innovation Impact
-- 🎯 Addresses real medical need
-- 🎯 Novel application of RL in healthcare
-- 🎯 User experience breakthrough
-- 🎯 Scalable, production-ready architecture
+- `/api/ai/calibrate` (POST, protected):
+  - Starts per‑user fine‑tune in a background thread and returns 202 immediately
+
+- `/api/dev/simulate-data` (POST, protected, limited):
+  - Seeds 3 days of realistic readings using fast bulk inserts
+
+- `/api/dashboard` (GET, protected):
+  - Returns merged dashboard dataset for the user
 
 ---
 
-## 🤝 Contributing
+## Deployment
 
-We're moving fast! Here's how to jump in:
+Why not Render? The free tier didn’t meet our resource/runtime needs for this stack.
 
-### Immediate Priorities (Next 8 Hours)
-```bash
-# CRITICAL PATH - MUST COMPLETE TODAY
-1. Backend Dev 1: Data simulator endpoint (/api/dev/simulate-data)
-   └── This unblocks the entire frontend team
-   
-2. Frontend Dev 1: Glucose chart with dual lines (Recharts)
-   └── This is your demo centerpiece
-   
-3. Backend Dev 2: LSTM model training completion
-   └── Package predict_future_glucose() function
-   
-4. Frontend Dev 2: State management + API integration
-   └── Connect chart to live backend data
+Recommended options:
 
-# SECONDARY PRIORITIES  
-5. Recommendation flow (carbs → dose suggestion)
-6. Camera upload functionality
-7. UI polish and responsiveness
-8. Deployment pipeline setup
-```
+1) Railway (simple and free‑friendly)
+   - New Project → Deploy from Repo → select this repo
+   - In service settings, set Monorepo Root to `aura-backend`
+   - Set env vars: `DATABASE_URL`, `JWT_SECRET_KEY`, `CORS_ORIGINS` (and `RATELIMIT_STORAGE_URI` if used)
+   - Deploy and use the provided URL as your API base
 
-### Development Guidelines
-- 🎯 **Demo First**: Prioritize features that wow judges
-- ⚡ **Speed Over Perfection**: Working > polished for hackathon
-- 🔗 **Unblock Early**: Simulator data enables parallel development  
+2) Google Cloud Run (scalable)
+   - Uses `aura-backend/Dockerfile`
+   - See `DEPLOYMENT.md` for step‑by‑step `gcloud` build and deploy, and required env vars
+
+Tip: After deployment, update your frontend to point to the deployed API base URL and make sure `CORS_ORIGINS` includes that origin.
+
+---
+
+## Troubleshooting
+
+- DB connection error: verify `DATABASE_URL` (Neon) and that sslmode=require is present
+- 401 Unauthorized: missing/expired JWT or `user_id` mismatch with token
+- 403 Unauthorized user context: token user_id doesn’t match the provided `user_id`
+- 429 Too Many Requests: you hit the rate limit; try later
+- CORS blocked: update `CORS_ORIGINS` to include your frontend origin exactly
+- PDF generation: ensure `aura-backend/temp_reports/` is writable (kept in repo via `.gitkeep`)
+
+---
+
+## License
+
+This project is licensed under the MIT License – see the `LICENSE` file for details.
+
+---
+
+## Acknowledgements
+
+- Flask, Flask‑JWT‑Extended, Flask‑Limiter, Flask‑CORS
+- TensorFlow/Keras, scikit‑learn, SciPy
+- psycopg2, Neon Postgres
+- Gunicorn
+
+— Made with care to lower the cognitive load of diabetes management.
 - 📊 **Chart is King**: The glucose visualization is your winning feature
 - 🧠 **AI Must Work**: Models should produce reasonable outputs
 - 🌐 **Web-First**: Optimize for browser performance, not mobile apps
