@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: aura-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r aura-backend/requirements.txt
+  startCommand: cd aura-backend && gunicorn -w 2 -k gthread -b 0.0.0.0:$PORT wsgi:app
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: RATELIMIT_STORAGE_URI
+        sync: false

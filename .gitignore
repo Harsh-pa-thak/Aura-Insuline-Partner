@@ -1,0 +1,47 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+*.log
+
+# Coverage / test caches
+.pytest_cache/
+.mypy_cache/
+.coverage*
+coverage.xml
+htmlcov/
+
+# Virtual environments & env files
+.env
+.venv/
+venv/
+aura-backend/venv/
+*.env
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated reports & temp files (keep directory)
+aura-backend/temp_reports/*
+!aura-backend/temp_reports/.gitkeep
+
+# Keep model artifacts tracked (do NOT ignore)
+# !aura-backend/*.h5
+# !aura-backend/*.gz
+# !aura-backend/*.zip
+.venv
+.idea
+/aura-backend/venv
+/aura-backend/__pycache__
+/aura-backend/temp_reports
