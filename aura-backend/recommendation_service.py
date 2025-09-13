@@ -3,33 +3,49 @@
 import numpy as np
 import os
 
-# Use dynamic import to avoid hard dependency during static analysis
-import importlib
-try:
-    _sb3 = importlib.import_module("stable_baselines3")
-    DQN = getattr(_sb3, "DQN", None)
-except Exception as _e:
-    DQN = None
-    print(f"Recommendation service: stable_baselines3 not available ({_e}). Using heuristic-only recommendations.")
-
-# --- Configuration & Model Loading ---
+# --- Lazy Loading Configuration ---
+# The model is not loaded at startup. It will be loaded on the first API call.
+_rl_model = None 
 MODEL_PATH = "aura_dqn_agent"
-DEVICE = "cpu" # We use CPU for inference as it's fast enough and avoids GPU issues locally
+DEVICE = "cpu"
 
-print("Loading RL agent for recommendation service...")
-if DQN is not None:
+def _get_rl_model():
+    """
+    Loads the RL agent model on the first call and caches it.
+    This prevents slow startup times for the web server.
+    """
+    global _rl_model
+    # If model is already loaded, return it instantly.
+    if _rl_model is not None:
+        return _rl_model
+
+    # --- First-time loading logic ---
+    print("--- [Recommender] Loading RL agent for the first time... ---")
     try:
-        # Resolve model path with or without .zip
-        candidate_paths = [MODEL_PATH, f"{MODEL_PATH}.zip"]
-        load_path = next((p for p in candidate_paths if os.path.exists(p)), candidate_paths[0])
-        # Load the trained agent
-        model = DQN.load(load_path, device=DEVICE)
-        print("RL agent loaded successfully.")
+        # Dynamically import to avoid loading the library at startup
+        import importlib
+        _sb3 = importlib.import_module("stable_baselines3")
+        DQN = getattr(_sb3, "DQN", None)
+
+        if DQN is not None:
+            # Resolve model path with or without .zip
+            candidate_paths = [MODEL_PATH, f"{MODEL_PATH}.zip"]
+            load_path = next((p for p in candidate_paths if os.path.exists(p)), None)
+
+            if load_path:
+                # Load the trained agent and cache it in the global variable
+                _rl_model = DQN.load(load_path, device=DEVICE)
+                print("--- [Recommender] RL agent loaded successfully. ---")
+                return _rl_model
+            else:
+                print(f"--- [Recommender] WARNING: RL model file not found at '{MODEL_PATH}'. ---")
+                return None
+        else:
+            print("--- [Recommender] WARNING: stable_baselines3 library not available. ---")
+            return None
     except Exception as e:
-        print(f"WARNING: Could not load the RL agent model. Error: {e}. Falling back to heuristics.")
-        model = None
-else:
-    model = None
+        print(f"--- [Recommender] CRITICAL ERROR: Could not load RL agent model. Error: {e} ---")
+        return None
 
 # --- The Main API Function ---
 def get_insulin_recommendation(
@@ -43,53 +59,42 @@ def get_insulin_recommendation(
     """
     Advanced insulin recommendation for the Aura backend.
     Combines a trained RL model with safety heuristics.
-    
-    Returns:
-        A dictionary containing the recommendation and supporting information.
     """
+    # This line ensures the model is loaded, but only on the first call.
+    model = _get_rl_model()
+
     if model is None:
         return {
-            "error": "RL model is not loaded. Cannot provide recommendation."
+            "error": "RL model is not available. Cannot provide AI recommendation."
         }
 
     try:
         # --- 1. RL Model Base Recommendation ---
-        # Create an observation vector similar to the training environment
-        active_insulin_estimate = max(0, 4 - last_insulin_hours * 2) # Simplified estimate
-        trend_estimate = 0 # Assume stable trend for a single recommendation
+        active_insulin_estimate = max(0, 4 - last_insulin_hours * 2)
+        trend_estimate = 0
         time_since_meal_est = last_insulin_hours
-
         obs = np.array([glucose, trend_estimate, time_hour, active_insulin_estimate, time_since_meal_est], dtype=np.float32)
         
-        # Get the base "correction" dose from the trained model
         action, _ = model.predict(obs, deterministic=True)
-        # The agent learned "doing nothing is safe", so we will use its output as a small adjustment
-        # and rely more on standard math, which is safer for a demo.
         base_correction_dose = float(action) * 0.5
 
         # --- 2. Standard Calculation (Heuristics) ---
-        carb_ratio = 12  # grams per unit
-        insulin_sensitivity = 50 # mg/dL per unit
+        carb_ratio = 12
+        insulin_sensitivity = 50
         target_glucose = 110
-
         meal_bolus = carbs / carb_ratio if carbs > 0 else 0
         standard_correction_dose = (glucose - target_glucose) / insulin_sensitivity
 
         # --- 3. Hybrid Dose Calculation ---
-        # We combine the standard, reliable math with a small nudge from the AI.
-        # This is a safer, more "explainable" approach for the demo.
-        # We will primarily use the standard calculation.
-        
-        total_dose = meal_bolus + max(0, standard_correction_dose) # Don't correct for low glucose
+        total_dose = meal_bolus + max(0, standard_correction_dose)
 
         # --- 4. Apply Adjustments for Context ---
         if exercise_recent:
-            total_dose *= 0.7  # Reduce insulin by 30% for recent exercise
+            total_dose *= 0.7
         if stress_level > 5:
-            total_dose *= (1 + stress_level * 0.05) # Increase for stress
+            total_dose *= (1 + stress_level * 0.05)
         
-        # Safety clamp
-        final_dose = max(0, min(total_dose, 20))
+        final_dose = max(0, min(total_dose, 20)) # Safety clamp
 
         # --- 5. Generate Response ---
         reason = f"Calculated for {carbs}g carbs and a current glucose of {glucose}."
@@ -102,6 +107,4 @@ def get_insulin_recommendation(
         }
 
     except Exception as e:
-        return {
-            "error": str(e),
-        }
+        return {"error": str(e)}
