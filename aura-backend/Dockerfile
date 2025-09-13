@@ -28,4 +28,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Start via Gunicorn using the WSGI entrypoint
-CMD ["gunicorn", "-w", "2", "-k", "gthread", "-b", "0.0.0.0:${PORT}", "wsgi:app"]
+CMD gunicorn -w 2 -k gthread -b 0.0.0.0:${PORT} wsgi:app
