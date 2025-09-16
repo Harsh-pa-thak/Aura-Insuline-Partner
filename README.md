@@ -15,6 +15,13 @@ AI‑assisted diabetes companion backend: secure user auth, NLP‑powered chat i
 
 ---
 
+## Live demo
+
+- Deployed (Render): https://aura-insuline-partner.onrender.com/index.html
+- Note: Render free services may sleep or throttle under load; initial request can be slow to “cold start.” See Deployment for alternatives.
+
+---
+
 ## Highlights
 
 - Secure by default: JWT auth, per‑route rate limiting, and CORS allow‑list
@@ -34,6 +41,8 @@ AI‑assisted diabetes companion backend: secure user auth, NLP‑powered chat i
 
 ```
 Aura-Insuline-Partner/
+├─ frontend/
+│  ├─ combined.html               # Combined UI for auth + dashboard + chat
 ├─ aura-backend/
 │  ├─ app.py                 # Flask app with routes, JWT, limiter, CORS
 │  ├─ config.py              # Env‑driven config (DATABASE_URL, JWT_SECRET_KEY, ...)
@@ -293,7 +302,7 @@ Key error modes handled:
 
 ## Deployment
 
-Why not Render? The free tier didn’t meet our resource/runtime needs for this stack.
+Status: A live instance currently runs on Render. Note that the free tier can sleep and may not handle heavy workloads reliably.
 
 Recommended options:
 
@@ -308,6 +317,17 @@ Recommended options:
    - See `DEPLOYMENT.md` for step‑by‑step `gcloud` build and deploy, and required env vars
 
 Tip: After deployment, update your frontend to point to the deployed API base URL and make sure `CORS_ORIGINS` includes that origin.
+
+---
+
+## New features (recent)
+
+- Dockerized backend with Compose for local development
+- JWT auth wired into frontend pages; token stored and attached to requests
+- Health endpoint exposes DB status and allowed CORS
+- Faster data simulator using bulk inserts
+- PDF report generator with glucose chart and meal table
+- Detailed README with architecture, data flow, and troubleshooting
 
 ---
 
