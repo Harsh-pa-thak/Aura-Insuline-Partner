@@ -1005,7 +1005,9 @@
       // Backend API base URL:
       // - For local dev, defaults to http://127.0.0.1:5001
       // - For production, set window.__AURA_API_BASE__ before this script or inline replace during deploy
-      const DEFAULT_API = "https://aura-insuline-backend.onrender.com/";
+
+      // <!-- <<< THE ONLY CHANGE IS ON THE LINE BELOW -->
+      const DEFAULT_API = "https://aura-insuline-backend.onrender.com";
       const BASE_URL = DEFAULT_API;
       let currentUserId = null;
       let chartState = { chart: null, historicalData: [], predictionData: [] };
