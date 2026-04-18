@@ -356,60 +356,58 @@ This project is licensed under the MIT License – see the `LICENSE` file for de
 - Gunicorn
 
 — Made with care to lower the cognitive load of diabetes management.
-- 📊 **Chart is King**: The glucose visualization is your winning feature
-- 🧠 **AI Must Work**: Models should produce reasonable outputs
-- 🌐 **Web-First**: Optimize for browser performance, not mobile apps
+- **Chart is King**: The glucose visualization is your winning feature
+- **AI Must Work**: Models should produce reasonable outputs
+- **Web-First**: Optimize for browser performance, not mobile apps
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👥 Team
+## Team
 
-**Built with ❤️ by the Aura Team**
+**Built with by Harsh**
 
-- 🏗️ **Backend Architect** - API & Infrastructure
-- 🧠 **AI Specialist** - ML Models & Predictions  
-- 🎨 **UI/UX Designer** - Beautiful Interfaces
-- ⚡ **Integration Master** - Making it all work together
+- **Backend Architect** - API & Infrastructure
+- **AI Specialist** - ML Models & Predictions  
+- **UI/UX Designer** - Beautiful Interfaces
+- **Integration Master** - Making it all work together
 
 ---
 
-## 🔮 Future Vision
+## Future Vision
 
 Project Aura's web-first approach enables rapid scaling and feature development:
 
 #### **Phase 2: Advanced Intelligence**
-- 🧬 **Personalization Engine**: Learn individual insulin sensitivity patterns
-- 📱 **Progressive Web App**: Offline functionality, push notifications
-- 🔗 **CGM Integration**: Real-time glucose streaming from Dexcom, FreeStyle
-- 📊 **Advanced Analytics**: HbA1c predictions, time-in-range optimization
+- **Personalization Engine**: Learn individual insulin sensitivity patterns
+- **Progressive Web App**: Offline functionality, push notifications
+- **CGM Integration**: Real-time glucose streaming from Dexcom, FreeStyle
+- **Advanced Analytics**: HbA1c predictions, time-in-range optimization
 
 #### **Phase 3: Healthcare Ecosystem**
-- 🏥 **Provider Dashboard**: Share insights with endocrinologists
-- 👥 **Community Features**: Anonymous benchmarking, peer support
-- 🔬 **Research Platform**: Opt-in data contribution for diabetes research
-- 🌍 **Global Scale**: Multi-language support, regional medical guidelines
+- **Provider Dashboard**: Share insights with endocrinologists
+- **Community Features**: Anonymous benchmarking, peer support
+- **Research Platform**: Opt-in data contribution for diabetes research
+- **Global Scale**: Multi-language support, regional medical guidelines
 
 #### **Phase 4: AI Evolution**  
-- 🤖 **Multi-Modal Learning**: Combine glucose, activity, sleep, stress data
-- 🔮 **Long-term Forecasting**: Weekly/monthly glucose trend predictions
-- 💊 **Medication Optimization**: AI-suggested therapy adjustments
-- 🧬 **Precision Medicine**: Genetic factors in diabetes managementare
-- 🤖 **Advanced AI**: Multi-modal learning, federated learning across users
+- **Multi-Modal Learning**: Combine glucose, activity, sleep, stress data
+- **Long-term Forecasting**: Weekly/monthly glucose trend predictions
+- **Medication Optimization**: AI-suggested therapy adjustments
+- **Precision Medicine**: Genetic factors in diabetes managementare
+- **Advanced AI**: Multi-modal learning, federated learning across users
 
 ---
 
 <div align="center">
 
-### 🚀 **Ready to revolutionize diabetes management?**
+### **Ready to revolutionize diabetes management?**
 
-[Get Started](#-quick-start) • [View Demo](https://demo.projectaura.ai) • [Join the Team](mailto:team@projectaura.ai)
-
-**⭐ Star this repo if you believe in AI-powered healthcare!**
+**Star this repo if you believe in AI-powered healthcare!**
 
 </div>
